@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.min.js"></script>
 
     <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="./css/styles.css" rel="stylesheet" />
+    <link href="./static/css/styles.css" rel="stylesheet" />
     <title>Document</title>
   </head>
   <body>
@@ -22,7 +22,7 @@
     ></script>
 
     <!-- chat.js 사용 -->
-    <script src="./js/chat.js"></script>
+    <script src="./static/js/chat.js"></script>
 
     <main class="content">
       <div class="container p-0">
@@ -115,72 +115,26 @@
               </div>
 
               <!-- 채팅 메세지 div -->
-              <div class="position-relative">
-                <div id="messages" class="chat-messages p-4">
-                  <!-- 메세지 -->
-                  <div id="message">
-                    <div class="chat-message-right mb-4">
-                      <!-- 이미지 -->
-                      <div id="profile">
-                        <img
-                          src="https://bootdey.com/img/Content/avatar/avatar1.png"
-                          class="rounded-circle mr-1"
-                          alt="Chris Wood"
-                          width="40"
-                          height="40"
-                          id="avatar"
-                        />
-                        <div
-                          class="text-muted small text-nowrap mt-2"
-                          id="time"
-                        >
-                          2:43 오후
-                        </div>
-                      </div>
-                      <!-- 메세지 내용 -->
-                      <div id="content"
-                        class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"
-                      >
-                        <div id="name" class="font-weight-bold mb-1">나</div>
-                        안녕하세요, 무엇을 도와드릴까요?
-                      </div>
-                    </div>
-                  </div>
-
-                  <div id="message">
-                    <div class="chat-message-left pb-4">
-                      <div>
-                        <img
-                          src="https://bootdey.com/img/Content/avatar/avatar3.png"
-                          class="rounded-circle mr-1"
-                          alt="Sharon Lessman"
-                          width="40"
-                          height="40"
-                        />
-                        <div class="text-muted small text-nowrap mt-2">
-                          2:44 am
-                        </div>
-                      </div>
-                      <div
-                        class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3"
-                      >
-                        <div class="font-weight-bold mb-1">민원인 1</div>
-                        안녕하세요, 주민등록증을 잃어버렸습니다.
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div data-bs-spy="scroll" class="position-relative">
+                <div id="messages" class="chat-messages p-4"></div>
               </div>
 
               <!-- 메세지 입력 div -->
               <div class="flex-grow-0 py-3 px-4 border-top">
                 <div class="input-group">
                   <input
+                    id="sendingMessage"
                     type="text"
                     class="form-control"
                     placeholder="메세지를 입력하세요"
                   />
-                  <button id="sendBtn" onclick="sendMessage()" class="btn btn-primary">보내기</button>
+                  <button
+                    id="sendBtn"
+                    onclick="sendMessage()"
+                    class="btn btn-primary"
+                  >
+                    보내기
+                  </button>
                 </div>
               </div>
             </div>

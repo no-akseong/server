@@ -1,15 +1,10 @@
-function logMessage(message, location) {
+function logMessage(message, sender, location) {
     // 현재 시간을 가져오기
     let currentTime = new Date().toLocaleTimeString();
 
     let msgLocationClass = "chat-message-left pb-4";
     if (location == "right") {
         msgLocationClass = "chat-message-right mb-4"
-    }
-
-    let name = "민원인"
-    if (location == "right") {
-        name = "상담사"
     }
 
     // HTML 코드의 {time}과 {msg}를 현재 시간과 메시지로 치환하고 messages div에 추가
@@ -34,7 +29,7 @@ function logMessage(message, location) {
             <div id="content"
                 class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"
             >
-                <div id="name" class="font-weight-bold mb-1"><b>${name}</b></div>
+                <div id="name" class="font-weight-bold mb-1"><b>${sender}</b></div>
                 ${message}
             </div>
         </div>
@@ -45,19 +40,38 @@ function logMessage(message, location) {
     document.getElementById("messages").innerHTML += html;
 }
 
+// sender 누구인지 확인
+let currentURL = window.location.href;
+var pathSegments = currentURL.split('/');
+var lastSegment = pathSegments[pathSegments.length - 1];
+const sender = lastSegment;
+console.log("sender: " + sender)
 
 
 let socket = io.connect('http://' + document.domain + ':' + location.port);
-
 socket.on('message', (msg) => {
-    console.log('Message: ' + msg);
-    logMessage(msg, "left");
+    if (msg.sender != sender) {
+        logMessage(msg.text, msg.sender, "left");
+    }
+    console.log('Message: ' + msg.text);
 });
 
 function sendMessage() {
-    let sendBtn = document.getElementById('sendBtn');
-    let msg = sendBtn.value;
-    
-    logMessage(msg, "right");
+    let sendBtn = document.getElementById('sendingMessage');
+    let msg = { "text": sendBtn.value, "sender": sender }
+
+    // const loc = "right"
+    // if (id == "customer") {
+    //     loc = "left"
+    // }
+
+    logMessage(msg.text, sender, "right");
     socket.emit('message', msg);
+
+    // 메세지 전송 후 input 초기화
+    sendBtn.value = "";
 }
+
+// // id가 sendBtn인 버튼을 클릭하면 sendMessage 함수를 실행
+// document.getElementById('sendBtn').onclick = sendMessage;
+
