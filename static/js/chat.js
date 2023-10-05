@@ -29,7 +29,7 @@ function logMessage(message, sender, location) {
             <div id="content"
                 class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"
             >
-                <div id="name" class="font-weight-bold mb-1"><b>${sender}</b></div>
+                <div id="name" class="font-weight-bold mb-1"><b>${toKor(sender)}</b></div>
                 ${message}
             </div>
         </div>
@@ -40,38 +40,110 @@ function logMessage(message, sender, location) {
     document.getElementById("messages").innerHTML += html;
 }
 
-// sender 누구인지 확인
-let currentURL = window.location.href;
-var pathSegments = currentURL.split('/');
-var lastSegment = pathSegments[pathSegments.length - 1];
-const sender = lastSegment;
-console.log("sender: " + sender)
-
-
-let socket = io.connect('http://' + document.domain + ':' + location.port);
-socket.on('message', (msg) => {
-    if (msg.sender != sender) {
-        logMessage(msg.text, msg.sender, "left");
+function toKor(str) {
+    switch (str) {
+        case "customer":
+            return "고객";
+        case "service":
+            return "상담사";
+        case "chatbot":
+            return "챗봇";
     }
-    console.log('Message: ' + msg.text);
-});
+}
+
+
 
 function sendMessage() {
-    let sendBtn = document.getElementById('sendingMessage');
-    let msg = { "text": sendBtn.value, "sender": sender }
+    const msg = msg_input.value;
+    if (msg == '') {
+        return;
+    }
+    
+    // 메시지 전송
+    if (receiver == "chatbot") {
+        _sendMessage(msg, sender, "bot");
+    } else {
+        _sendMessage(msg, sender);
+    }
+    msg_input.value = ''; // 입력창 초기화
+}
 
-    // const loc = "right"
-    // if (id == "customer") {
-    //     loc = "left"
-    // }
+async function _sendMessage(msg, sender, to = 'all') {
+    let data = { "text": msg, "sender": sender }
 
-    logMessage(msg.text, sender, "right");
-    socket.emit('message', msg);
+    // 메세지 로깅
+    logMessage(msg, sender, "right");
+
+    if (to == 'all') {
+        socket.emit('message', data);
+    } else if (to == 'bot') {
+        const response = await sendMsgToAI(msg)
+        logMessage(response.text, "chatbot", "left");
+    }
 
     // 메세지 전송 후 input 초기화
     sendBtn.value = "";
 }
 
-// // id가 sendBtn인 버튼을 클릭하면 sendMessage 함수를 실행
-// document.getElementById('sendBtn').onclick = sendMessage;
+async function sendMsgToAI(msg) {
+    const data = { text: msg };
 
+    const response = await fetch('/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+        throw new Error(`메세지 전송 실패 (/chat) ${response.status}`);
+    }
+    return await response.json();
+}
+
+
+
+let receiver, sender, msg_input, socket;
+document.addEventListener('DOMContentLoaded', function () {
+    // sender 누구인지 확인
+    let currentURL = window.location.href;
+    var pathSegments = currentURL.split('/');
+    var lastSegment = pathSegments[pathSegments.length - 1];
+    receiver = lastSegment;
+    sender = "";
+
+    switch (receiver) {
+        case "customer":
+            sender = "service";
+            break;
+        case "service":
+        case "chatbot":
+            sender = "customer";
+    }
+    console.log("sender: " + sender)
+
+
+    socket = io.connect('http://' + document.domain + ':' + location.port);
+    socket.on('message', (msg) => {
+        // receiver가 chatbot일 때는 로깅하기 않음
+        if (receiver == "chatbot") {
+            return;
+        }
+
+        if (msg.sender != sender) {
+            logMessage(msg.text, msg.sender, "left");
+        }
+        console.log('Message: ' + msg.text);
+    });
+
+    // 메시지 전송 버튼
+    msg_input = document.getElementById('sendingMessage'); // 메시지 입력창
+    msg_input.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') {
+            return
+        }
+        event.preventDefault(); // 기본 동작 방지
+        sendMessage();
+    });
+});

@@ -190,3 +190,4 @@ htmlcov/
 # nonegative
 test/
 logs/
+openai-api-key.txt

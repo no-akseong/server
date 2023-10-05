@@ -1,6 +1,6 @@
 from datetime import datetime
 import val
-from utils import log
+from nonegative.utils import log
 import json
 import os
 
@@ -14,11 +14,22 @@ def create_file(file):
     open(file, 'w').close()
 
 
+def is_empty_dir(path):
+    with os.scandir(path) as entries:
+        return not any(entries)
+
+
 def pprint(d):
+    """
+    Pretty print
+    """
     print(pprints(d))
 
 
 def pprints(d):
+    """
+    Pretty print string
+    """
     return json.dumps(d, indent="\t")
 
 
@@ -34,6 +45,7 @@ def _setup_log():
     log.set_level(val.PROJECT_NAME, val.LOG_LEVEL)
     logger_inited = True
     return _logger
+
 
 logger_inited = False
 logger = _setup_log()
