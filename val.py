@@ -5,6 +5,10 @@ from os.path import join, abspath, dirname, sep
 PROJECT_NAME = "nonegative"
 LOG_LEVEL = "d"
 PORT = 11111
+NEGATIVE_THRESHOLD = -0.2
+FILTERING_SERVER_DOMAIN = "localhost"
+FILTERING_SERVER_PORT = 11110
+FILTERING_SERVER = f"http://{FILTERING_SERVER_DOMAIN}:{FILTERING_SERVER_PORT}"
 
 # 루트
 ROOT_DIR = os.path.dirname(abspath(__file__))
