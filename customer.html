@@ -1,4 +1,4 @@
-<!-- 상담사가 고객에게 접속해서 상담하는 페이지 -->
+<!-- 고객이 상담사에게 접속해서 상담하는 페이지 -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +14,7 @@
 
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="./static/css/styles.css" rel="stylesheet" />
-    <title>고객 상담</title>
+    <title>상담사 상담</title>
   </head>
   <body>
     <script
@@ -24,11 +24,12 @@
     ></script>
 
     <!-- chat.js 사용 -->
-    <script src="./static/js/chat.js"></script>
+    <script type="module" src="./static/js/common.js"></script>
+    <script type="module" src="./static/js/customer.js"></script>
 
     <main class="content">
       <div class="container p-0">
-        <h1 class="h3 mb-3">고객 상담</h1>
+        <h1 class="h3 mb-3">상담사 상담</h1>
 
         <div class="card">
           <div class="row g-0">
@@ -46,7 +47,7 @@
                     />
                   </div>
                   <div class="flex-grow-1 pl-3">
-                    <strong>민원인</strong>
+                    <strong>상담사</strong>
                     <!-- <div class="text-muted small"><em>Typing...</em></div> -->
                   </div>
                   <div>
@@ -132,7 +133,6 @@
                   />
                   <button
                     id="sendBtn"
-                    onclick="sendMessage()"
                     class="btn btn-primary"
                   >
                     보내기

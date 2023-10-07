@@ -1,12 +1,3 @@
 flask
 flask-sslify
 flask-socketio
-langchain
-openai
-sentence_transformers
-tiktoken
-requests
-chromadb
-duckduckgo-search
-beautifulsoup4
-chardet

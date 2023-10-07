@@ -24,7 +24,8 @@
     ></script>
 
     <!-- chat.js 사용 -->
-    <script src="./static/js/chat.js"></script>
+    <script type="module" src="./static/js/common.js"></script>
+    <script type="module" src="./static/js/chatbot.js"></script>
 
     <main class="content">
       <div class="container p-0">
@@ -132,7 +133,6 @@
                   />
                   <button
                     id="sendBtn"
-                    onclick="sendMessage()"
                     class="btn btn-primary"
                   >
                     보내기

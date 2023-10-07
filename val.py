@@ -4,6 +4,7 @@ from os.path import join, abspath, dirname, sep
 # 설정값
 PROJECT_NAME = "nonegative"
 LOG_LEVEL = "d"
+PORT = 11111
 
 # 루트
 ROOT_DIR = os.path.dirname(abspath(__file__))
@@ -21,3 +22,4 @@ RES_DOCS_DIR = join(RES_DIR, "docs")
 
 DATA_DIR = join(ROOT_DIR, "data")
 CONVERSATIONS_DIR = join(DATA_DIR, "conversations")
+DOCS_VECTOR_DB_DIR = join(DATA_DIR, "docs_vector_db")
