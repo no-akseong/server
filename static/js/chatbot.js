@@ -2,9 +2,8 @@
 민원인이 챗봇과 대화하는 페이지
 */
 
-import { logMessage, sendMessage, socket } from './common.js';
+import { logMessage, sendMessage, socket, sender } from './common.js';
 
-const sender = "chatbot";
 
 // 부트 스트랩 로딩 딜레이: DOMContentLoaded 후 등록
 document.addEventListener('DOMContentLoaded', onLoad);

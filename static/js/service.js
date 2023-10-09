@@ -2,9 +2,8 @@
 상담사가 고객을 대응하는 페이지
 */
 
-import { logMessage, sendMessage, socket } from './common.js';
+import { logMessage, sendMessage, socket, sender } from './common.js';
 
-const sender = "service";
 let msg_input;
 // 부트 스트랩 로딩 딜레이: DOMContentLoaded 후 등록
 document.addEventListener('DOMContentLoaded', function () {
@@ -43,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
         socket.emit('passToChatbot', { "reason": "service" });
 
         // 상대방이 나갔다는 메세지 전송
-        logMessage("민원이 나갔습니다.", "customer", "left");
+        logMessage("고객이 나갔습니다.<br>챗봇이 고객을 대응합니다.", "system");
     }
 });
 

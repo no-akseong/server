@@ -1,17 +1,15 @@
-export function logMessage(message, sender, location) {
+export function logMessage(message, sender, location = "center") {
     // 현재 시간을 가져오기
     let currentTime = new Date().toLocaleTimeString();
 
-    let msgLocationClass = "chat-message-left pb-4";
+    let msgLocationClass = "chat-message pb-4"; // 중앙
     if (location == "right") {
         msgLocationClass = "chat-message-right mb-4"
+    } else if (location == "left") {
+        msgLocationClass = "chat-message-left pb-4"
     }
 
-    // HTML 코드의 {time}과 {msg}를 현재 시간과 메시지로 치환하고 messages div에 추가
-    let html = `
-    <!-- 메세지 -->
-    <div id="message">
-        <div class="${msgLocationClass}">
+    let profile_div = `
             <div id="profile">
                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png"
                     class="rounded-circle mr-1"
@@ -26,10 +24,25 @@ export function logMessage(message, sender, location) {
                     ${currentTime}
                 </div>
             </div>
+    `
+    let style1 = ''
+    let style2 = ''
+    if (sender === "system") {
+        profile_div = ''
+        style1 = `text-center`
+        style2 = `text-danger`
+    }
+
+    // HTML 코드의 {time}과 {msg}를 현재 시간과 메시지로 치환하고 messages div에 추가
+    let html = `
+    <!-- 메세지 -->
+    <div id="message">
+        <div class="${msgLocationClass}">
+            ${profile_div}
             <div id="content"
-                class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"
+                class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3 ${style1}"
             >
-                <div id="name" class="font-weight-bold mb-1"><b>${toKor(sender)}</b></div>
+                <div id="name" class="font-weight-bold mb-1 ${style2}"><b>${toKor(sender)}</b></div>
                 ${message}
             </div>
         </div>
@@ -49,7 +62,7 @@ export function toKor(str) {
         case "chatbot":
             return "챗봇";
         case "system":
-            return "시스템";
+            return "알림";
         default:
             return str;
     }
@@ -57,7 +70,7 @@ export function toKor(str) {
 
 // 메세지 로깅 따로 필요함
 export function sendMessage(msg, from, to) {
-    let data = { "text": msg, "from": from, "to": to}
+    let data = { "text": msg, "from": from, "to": to }
     // 메세지 전송
     socket.emit('message', data);
 }
@@ -66,38 +79,18 @@ export function sendMessage(msg, from, to) {
 
 export const socket = io.connect('http://' + document.domain + ':' + location.port);
 
+// sender 누구인지 확인
+let currentURL = window.location.href;
+var pathSegments = currentURL.split('/');
+export var sender = pathSegments[pathSegments.length - 1];
+
 // 부트 스트랩 로딩 딜레이: DOMContentLoaded 후 등록
 document.addEventListener('DOMContentLoaded', function () {
-    // sender 누구인지 확인
-    // let currentURL = window.location.href;
-    // var pathSegments = currentURL.split('/');
-    // var lastSegment = pathSegments[pathSegments.length - 1];
-    // receiver = lastSegment;
-    // sender = "";
-
-    // switch (receiver) {
-    //     case "customer":
-    //         sender = "service";
-    //         break;
-    //     case "service":
-    //     case "chatbot":
-    //         sender = "customer";
-    // }
-    // console.log("sender: " + sender)
-
-
-    // socket = io.connect('http://' + document.domain + ':' + location.port);
-    // socket.on('message', (msg) => {
-    //     // receiver가 chatbot일 때는 로깅하기 않음
-    //     if (receiver == "chatbot") {
-    //         return;
-    //     }
-
-    //     if (msg.sender != sender) {
-    //         logMessage(msg.text, msg.sender, "left");
-    //     }
-    //     console.log('Message: ' + msg.text);
-    // });
+    socket.on('notify', (msg) => {
+        if (msg.to === sender) {
+            logMessage(msg.text, "system");
+        }
+    });
 
     // 메시지 전송 버튼
     // msg_input = document.getElementById('sendingMessage'); // 메시지 입력창

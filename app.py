@@ -65,8 +65,17 @@ def handle_message(message):
                 d(f"순화된 문장: {refined_text}")
                 message["text"] = refined_text
                 message["refined"] = True
-
-    socketio.emit("message", message)  # 받은 메시지를 모든 클라이언트에게 전송
+            
+            # 참을 수 있는 횟수를 초과했을 때 고객을 챗봇으로 넘겨줌
+            global patient_cnt
+            patient_cnt += 1
+            if patient_cnt > val.SERVICE_PATIENT_LIMIT:
+                socketio.emit("passToChatbot", {"reason": "참을성 초과"})
+                socketio.emit("notify", {"text": f"고객의 부적절한 언행이 {val.SERVICE_PATIENT_LIMIT}회 초과되어 챗봇에게 넘겨졌습니다.", "to": "service"})
+                # 메세지 전송을 중단
+                return
+            
+    socketio.emit("message", message)
 
 
 @socketio.on("passToChatbot")
@@ -117,6 +126,9 @@ def setup():
     # 폴더 생성
     for directory in dirs:
         utils.mkdirs(directory)
+
+    global patient_cnt
+    patient_cnt = 0 # 참은 획수
 
 
 if __name__ == "__main__":

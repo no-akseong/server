@@ -2,9 +2,7 @@
 고객이 상담사와 대화하는 페이지
 */
 
-import { logMessage, sendMessage, socket } from './common.js';
-
-const sender = "customer";
+import { logMessage, sendMessage, socket, sender } from './common.js';
 
 
 let msg_input;
