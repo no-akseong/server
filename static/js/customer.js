@@ -2,7 +2,7 @@
 고객이 상담사와 대화하는 페이지
 */
 
-import { logMessage, sendMessage, socket, sender } from './common.js';
+import { logMessage, sendMessage, socket, sender, NOTIFY_DELAY } from './common.js';
 
 
 let msg_input;
@@ -30,20 +30,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     let sendBtn = document.getElementById("sendBtn");
-    sendBtn.addEventListener("click", () => {  
+    sendBtn.addEventListener("click", () => {
         const msg = msg_input.value;
         sendMsg(msg);
-    });
-
-
-    // 상담사가 민원인을 챗봇에게 넘겨줌
-    socket.on('passToChatbot', (msg) => {
-        console.log('Message: ' + msg.reason)
-        // 페이지 이동
-        window.location.href = "/chatbot";
-
-        // 대화창에 시스템 메세지 "부적절한 언어가 감지되었습니다. 챗봇으로 이동합니다." 출력
-        logMessage("부적절한 언어가 감지되었습니다. 챗봇으로 이동되었습니다.", "system", "right");
     });
 });
 

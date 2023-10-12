@@ -2,7 +2,7 @@
 상담사가 고객을 대응하는 페이지
 */
 
-import { logMessage, sendMessage, socket, sender } from './common.js';
+import { logMessage, sendMessage, socket, sender, NOTIFY_DELAY } from './common.js';
 
 let msg_input;
 // 부트 스트랩 로딩 딜레이: DOMContentLoaded 후 등록
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     let sendBtn = document.getElementById("sendBtn");
-    sendBtn.addEventListener("click", () => {  
+    sendBtn.addEventListener("click", () => {
         const msg = msg_input.value;
         sendMsg(msg);
     });
@@ -39,7 +39,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // service가 대화하고 있는 상대방customer의 페이지가 /chatbot 이동
     function sendCustomerToChatbot() {
-        socket.emit('passToChatbot', { "reason": "service" });
+        socket.emit('notify', {
+            "text": "부적절한 언어가 감지되었습니다. 챗봇으로 이동되었습니다.",
+            "to": "customer",
+            "action": "chatbot"
+        });
 
         // 상대방이 나갔다는 메세지 전송
         logMessage("고객이 나갔습니다.<br>챗봇이 고객을 대응합니다.", "system");

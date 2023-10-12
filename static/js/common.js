@@ -1,3 +1,6 @@
+export const NOTIFY_DELAY = 1000 * 5;
+
+
 export function logMessage(message, sender, location = "center") {
     // 현재 시간을 가져오기
     let currentTime = new Date().toLocaleTimeString();
@@ -87,8 +90,16 @@ export var sender = pathSegments[pathSegments.length - 1];
 // 부트 스트랩 로딩 딜레이: DOMContentLoaded 후 등록
 document.addEventListener('DOMContentLoaded', function () {
     socket.on('notify', (msg) => {
-        if (msg.to === sender) {
-            logMessage(msg.text, "system");
+        if (msg.to !== sender)
+            return
+
+        logMessage(msg.text, "system");
+        
+        if (msg.action) {
+            // 잠시 후 페이지 이동
+            const toChatbotTimer = setTimeout(function () {
+                window.location.href = `/${msg.action}`;
+            }, NOTIFY_DELAY);
         }
     });
 
