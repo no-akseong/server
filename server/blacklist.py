@@ -1,3 +1,12 @@
+"""
+data/blacklist.json에다가 참을성이 초과된 민원인의 아이디를 기록하고, 
+상담요청이 올 시 채팅이 불가능하도록 설정.
+
+형식
+{
+"id": ["id1", "id2", "id3"]
+}
+"""
 import json
 
 def load():

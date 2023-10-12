@@ -1,5 +1,5 @@
 import logging
-import utils as util
+import server.utils as util
 
 
 def get(name, file="./log.log"):

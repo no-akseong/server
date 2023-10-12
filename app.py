@@ -3,8 +3,8 @@ import server.api as api
 import server.blacklist as blacklist
 import requests
 import os
-from utils import i, d
-import utils as utils
+from server.utils import i, d
+import server.utils as utils
 import json
 from flask import Flask, send_file, request, jsonify
 from flask_socketio import SocketIO
@@ -33,6 +33,26 @@ def service_page():
 @app.route("/chatbot")
 def chatbot_page():
     return send_file("chatbot.html")
+
+@socketio.on("image")
+def handle_img(data):
+    image_data = data['img']
+    image_data = image_data.split(',')[1]  # 이미지 데이터 부분만 추출
+
+    # 이미지 적절성 판단
+    is_safe = api.img_obscenity(image_data)
+    if not is_safe:
+        socketio.emit(
+            "notify",
+            {
+                "text": f"부적절한 이미지가 감지되어 전송에 실패했습니다.",
+                "to": "customer",
+            },
+        )
+        return
+
+    socketio.emit('image', data)
+
 
 
 @socketio.on("message")
@@ -78,7 +98,7 @@ def is_negative(text):
     d(f"감정 점수: {sentiment_score}")
 
     # 감정 점수가 임계값 이하일때 문장 순화 요청
-    return sentiment_score <= val.NEGATIVE_THRESHOLD
+    return sentiment_score <= val.TEXT_NEGATIVE_THRESHOLD
 
 
 def refine_text(text):
@@ -167,14 +187,3 @@ if __name__ == "__main__":
     i(f"{val.PROJECT_NAME} 서버가 {val.PORT}포트에서 시작됩니다.")
     app.run(debug=True, host="0.0.0.0", port=val.PORT)
     i(f"{val.PROJECT_NAME} 서버 종료됨")
-
-
-"""
-data/blacklist.json에다가 참을성이 초과된 민원인의 아이디를 기록하고, 
-상담요청이 올 시 채팅이 불가능하도록 설정.
-
-형식
-{
-"id": ["id1", "id2", "id3"]
-}
-"""

@@ -1,6 +1,6 @@
 from datetime import datetime
 import val
-from utils import log
+from server.utils import log
 import json
 import os
 

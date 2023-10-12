@@ -56,6 +56,14 @@ export function logMessage(message, sender, location = "center") {
     document.getElementById("messages").innerHTML += html;
 }
 
+export function logImage(img, sender, location = "center") {
+    let imgElement = document.createElement('img');
+    imgElement.src = img; // 이미지 URL 설정
+    imgElement.style.maxWidth = '20%'; // 화면 너비의 20%까지만 허용
+    const tagHTML = imgElement.outerHTML;
+    logMessage(tagHTML, sender, location);
+}
+
 export function toKor(str) {
     switch (str) {
         case "customer":
@@ -78,7 +86,11 @@ export function sendMessage(msg, from, to) {
     socket.emit('message', data);
 }
 
-
+export function sendImage(img_data, from, to) {
+    let data = { "img": img_data, "from": from, "to": to }
+    // 이미지 전송
+    socket.emit('image', data);
+}
 
 export const socket = io.connect('http://' + document.domain + ':' + location.port);
 
@@ -95,6 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         logMessage(msg.text, "system");
         
+        // action이 있으면 해당 페이지로 이동
         if (msg.action) {
             // 잠시 후 페이지 이동
             const toChatbotTimer = setTimeout(function () {

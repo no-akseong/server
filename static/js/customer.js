@@ -2,7 +2,7 @@
 고객이 상담사와 대화하는 페이지
 */
 
-import { logMessage, sendMessage, socket, sender, NOTIFY_DELAY } from './common.js';
+import { logMessage, logImage, sendMessage, socket, sender, NOTIFY_DELAY, sendImage } from './common.js';
 
 
 let msg_input;
@@ -34,6 +34,40 @@ document.addEventListener('DOMContentLoaded', function () {
         const msg = msg_input.value;
         sendMsg(msg);
     });
+
+
+    // 버튼 요소와 파일 입력 요소를 가져옵니다.
+    const sendImgBtn = document.getElementById("sendImageBtn");
+    const fileInput = document.getElementById('fileInput');
+
+    // 버튼을 클릭할 때 파일 입력(input) 요소를 클릭합니다.
+    sendImgBtn.addEventListener('click', () => fileInput.click());
+
+    // 파일이 선택되면 해당 파일을 업로드합니다.
+    fileInput.addEventListener('change', handleFileSelect, false);
+
+    function handleFileSelect(event) {
+        const file = event.target.files[0]; // 선택한 파일
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // 서버로 파일을 업로드합니다.
+        if (file) {
+            // FileReader를 사용하여 이미지 파일을 읽어들임
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                // 이미지 데이터를 서버로 전송
+                socket.emit('send-image', { image: reader.result });
+                // 이미지 채팅방에 출력
+                logImage(reader.result, sender, "right");
+                // 이미지 전송
+                sendImage(reader.result, sender, "service");
+            };
+            reader.readAsDataURL(file); // 이미지를 데이터 URL로 읽어옴
+        } else {
+            alert('이미지를 선택하세요.');
+        }
+    }
 });
 
 

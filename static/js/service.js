@@ -2,7 +2,7 @@
 상담사가 고객을 대응하는 페이지
 */
 
-import { logMessage, sendMessage, socket, sender, NOTIFY_DELAY } from './common.js';
+import { logMessage, logImage, sendMessage, socket, sender, NOTIFY_DELAY } from './common.js';
 
 let msg_input;
 // 부트 스트랩 로딩 딜레이: DOMContentLoaded 후 등록
@@ -14,6 +14,16 @@ document.addEventListener('DOMContentLoaded', function () {
             return
         }
         logMessage(msg.text, msg.from, "left");
+        console.log('Message: ' + msg.text);
+    });
+
+    // 민원인의 이미지 수신
+    socket.on('image', (msg) => {
+        // from이 customer일 때만 로깅
+        if (msg.from !== "customer") {
+            return
+        }
+        logImage(msg.img, msg.from, "left");
         console.log('Message: ' + msg.text);
     });
 
