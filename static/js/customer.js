@@ -68,6 +68,32 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('이미지를 선택하세요.');
         }
     }
+
+
+    const callBtn = document.getElementById('callBtn');
+
+    callBtn.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+            // Peer connection 생성
+            const peerConnection = new RTCPeerConnection();
+
+            // 로컬 스트림 추가
+            stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+
+            // Offer 생성 및 로컬 설명 설정
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            // Offer를 상대방에게 전송 (여기서는 콘솔에 출력)
+            console.log('Offer 생성: ', offer);
+
+            // 여기서 offer를 상대방에게 전송하고, 상대방의 answer를 기다린 후 setRemoteDescription을 호출하면 연결이 완료됩니다.
+        } catch (err) {
+            console.error('미디어 디바이스 오류:', err);
+        }
+    });
 });
 
 
