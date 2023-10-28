@@ -12,6 +12,7 @@ from flask_socketio import SocketIO
 import val
 
 app = Flask(__name__)
+global socketio
 socketio = SocketIO(app)
 
 
@@ -118,16 +119,33 @@ def check_patience():
         socketio.emit(
             "notify",
             {
-                "text": f"고객의 부적절한 언행이 {val.SERVICE_PATIENT_LIMIT}회 초과되어 챗봇에게 넘겨졌습니다.",
+                "text": f"고객의 부적절한 언행이 {val.SERVICE_PATIENT_LIMIT}회 초과되어 챗봇에게 넘겨집니니다.",
                 "to": "customer",
                 "action": "chatbot",
+            },
+        )
+
+        socketio.emit(
+            "notify",
+            {
+                "text": f"고객의 부적절한 언행이 {val.SERVICE_PATIENT_LIMIT}회 초과되어 챗봇에게 넘겨졌습니다.",
+                "to": "service",
             },
         )
 
         # blacklist.json에 고객의 아이디("customer1")를 추가
         blacklist.add(val.TEST_CUSTOMER_ID)
         return False
-    return True
+    else:
+        # 고객에게 경고 주기
+        socketio.emit(
+            "notify",
+            {
+                "text": f"고객님의 부적절한 언행이 감지되었습니다. (경고: {patient_cnt}회)",
+                "to": "customer",
+            },
+        )
+        return True
 
 
 def is_service_angry():
@@ -156,6 +174,21 @@ def chat_response():
     d(f"챗봇 응답: {chatbot_response}")
     response = {"text": chatbot_response}
     return jsonify(response), 200
+
+
+# 음성통화
+@socketio.on('offer')
+def handle_offer(offer):
+    # offer를 받아와서 처리할 수 있는 로직을 여기에 추가합니다.
+    # 예를 들어, offer를 다른 클라이언트에게 브로드캐스팅하여 응답을 받을 수 있습니다.
+    socketio.emit('offer', offer, broadcast=True)
+
+@socketio.on('answer')
+def handle_answer(answer):
+    # answer를 받아와서 처리할 수 있는 로직을 여기에 추가합니다.
+    # 예를 들어, answer를 offer를 보낸 클라이언트에게 전송하여 연결을 설정할 수 있습니다.
+    socketio.emit('answer', answer, broadcast=True)
+
 
 
 def setup():

@@ -59,7 +59,7 @@ export function logMessage(message, sender, location = "center") {
 export function logImage(img, sender, location = "center") {
     let imgElement = document.createElement('img');
     imgElement.src = img; // 이미지 URL 설정
-    imgElement.style.maxWidth = '20%'; // 화면 너비의 20%까지만 허용
+    imgElement.style.maxWidth = '50%'; // 대화 메세지 div 너비의 50%까지만 허용
     const tagHTML = imgElement.outerHTML;
     logMessage(tagHTML, sender, location);
 }
