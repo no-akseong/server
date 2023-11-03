@@ -31,7 +31,7 @@ function onSend(event) {
 }
 
 async function sendMsg(msg) {
-    logMessage(msg, sender, "right");
+    logMessage(msg, "customer", "right");
     msg_input.value = '';
 
     const response = await sendMsgToAI(msg)

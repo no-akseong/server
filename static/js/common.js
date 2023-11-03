@@ -97,7 +97,14 @@ export const socket = io.connect('http://' + document.domain + ':' + location.po
 // sender 누구인지 확인
 let currentURL = window.location.href;
 var pathSegments = currentURL.split('/');
+
+/*
+페이지의 마지막 경로를 가져와서 보내는 사람을 확인
+예외: chatbot은 사실 고객이 보내지만, chatbot으로 url 만듬
+(그러므로 notify를 chatbot과 대화하는 고객한테 보낼 때, "chatbot"으로 보내야 함)
+*/
 export var sender = pathSegments[pathSegments.length - 1];
+
 
 // 부트 스트랩 로딩 딜레이: DOMContentLoaded 후 등록
 document.addEventListener('DOMContentLoaded', function () {
