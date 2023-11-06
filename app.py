@@ -15,7 +15,6 @@ app = Flask(__name__)
 global socketio
 socketio = SocketIO(app)
 
-
 @app.route("/")
 def index():
     return send_file("index.html")
@@ -34,6 +33,18 @@ def service_page():
 @app.route("/chatbot")
 def chatbot_page():
     return send_file("chatbot.html")
+
+@app.route("/voice_chatbot")
+def voice_chatbot_page():
+    return send_file("voice_chatbot.html")
+
+@app.route("/voice_customer")
+def voice_customer_page():
+    return send_file("voice_customer.html")
+
+@app.route("/voice_service")
+def voice_service_page():
+    return send_file("voice_service.html")
 
 @socketio.on("image")
 def handle_img(data):
@@ -95,11 +106,14 @@ def check_blacklist(id):
 
 def is_negative(text):
     # 문장 감정 점수 요청
-    sentiment_score = api.sentiment_score(text)
-    d(f"감정 점수: {sentiment_score}")
+    sentiment_scores = api.sentiment_score(text)
+    g_score = sentiment_scores['google_score']
+    s_score = sentiment_scores['simsimi_score']
+    d(f"감정 점수: g: {g_score}, s: {s_score}")
 
     # 감정 점수가 임계값 이하일때 문장 순화 요청
-    return sentiment_score <= val.TEXT_NEGATIVE_THRESHOLD
+    if sentiment_scores <= val.GOOGLE_TEXT_NEGATIVE_THRESHOLD:
+        True
 
 
 def refine_text(text):
@@ -169,11 +183,25 @@ def chat_response():
 
     # 사용자가 보낸 메시지
     user_msg = data["text"]
-    chatbot_response = api.chatbot_response(user_msg)
+    streaming = data.get("streaming", False)
+    chatbot_response = api.chatbot_response(user_msg, streaming=streaming)
 
     d(f"챗봇 응답: {chatbot_response}")
     response = {"text": chatbot_response}
     return jsonify(response), 200
+
+@app.route("/on_streaming_response", methods=["POST"])
+def on_streaming_response():
+    socketio.emit("chatbot-streaming-response", {'text': request.get_json()['text']})
+
+
+@socketio.on("voice_customer")
+def on_voice_customer(data):
+    d(f"/chat: {data}")
+    text = data["text"]
+    socketio.emit("voice-text", {'text': text})
+
+
 
 
 # 음성통화
@@ -211,6 +239,7 @@ def setup():
     # 참은 횟수 초기화
     global patient_cnt
     patient_cnt = 0
+    
 
 
 if __name__ == "__main__":
@@ -219,4 +248,5 @@ if __name__ == "__main__":
 
     i(f"{val.PROJECT_NAME} 서버가 {val.PORT}포트에서 시작됩니다.")
     app.run(debug=True, host="0.0.0.0", port=val.PORT)
+    socketio.run(app, port=22222)
     i(f"{val.PROJECT_NAME} 서버 종료됨")

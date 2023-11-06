@@ -2,3 +2,6 @@ flask
 flask-sslify
 flask-socketio
 requests
+pydub
+termcolor
+google-cloud-speech

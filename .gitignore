@@ -192,3 +192,4 @@ test/
 logs/
 openai-api-key.txt
 data/
+gcp_api_key.json

@@ -5,7 +5,8 @@ from os.path import join, abspath, dirname, sep
 PROJECT_NAME = "nonegative"
 LOG_LEVEL = "d"
 PORT = 11111
-TEXT_NEGATIVE_THRESHOLD = -0.2
+GOOGLE_TEXT_NEGATIVE_THRESHOLD = -0.2
+SIMSIMI_TEXT_NEGATIVE_THRESHOLD = 0.7
 IMG_NEGATIVE_THRESHOLD = 3
 SERVICE_PATIENT_LIMIT = 1 # NEGATIVE_THRESHOLD를 넘었을 때 최대 참을 수 있는 횟수
 FILTERING_SERVER_DOMAIN = "localhost"
@@ -23,3 +24,6 @@ LOG_DIR = join(ROOT_DIR, "logs")
 # data
 DATA_DIR = join(ROOT_DIR, "data")
 CONVERSATIONS_DIR = join(DATA_DIR, "conversations")
+
+# api 키
+GOOGLE_CLOUD_API_KEY = join(ROOT_DIR, r"gcp_api_key.json")

@@ -4,12 +4,12 @@ import json
 import requests
 
 
-def chatbot_response(text):
+def chatbot_response(text, streaming=False):
     chatbot_response = "챗봇이 응답하지 못했습니다."
 
     # 서버로 챗봇의 응답 요청
     url = val.FILTERING_SERVER + "/chat"
-    data = json.dumps({"text": text})
+    data = json.dumps({"text": text, "streaming": streaming})
     headers = {"Content-Type": "application/json; charset=utf-8"}
     response = requests.post(url, data=data, headers=headers)
 
@@ -23,10 +23,11 @@ def sentiment_score(text):
     headers = {"Content-Type": "application/json; charset=utf-8"}
     url = val.FILTERING_SERVER + "/sentiment"
     response = requests.post(url, data=data, headers=headers)
+    content = json.loads(response.content)
 
     sentiment_score = 1.0  # 만약 감정 점수를 받아오지 못하면 1.0으로 설정후 순화를 하지 않음
     if response.status_code == 200:
-        sentiment_score = json.loads(response.content)["score"]
+        sentiment_score = {'google_score': content["google_score"], 'simsimi_score': content["simsimi_score"]}
     return sentiment_score
 
 

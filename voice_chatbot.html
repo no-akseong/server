@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>음성 챗봇 상담</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.min.js"></script>
+
+</head>
+
+<body>
+    <script type="module" src="./static/js/voice/common.js"></script>
+    <script type="module" src="./static/js/voice/STT.js"></script>
+    <script type="module" src="./static/js/voice/TTS.js"></script>
+    <script type="module" src="./static/js/voice/chatbot.js"></script>
+
+    <button id="start-button">음성통화 시작</button>
+    <button id="stop-button">음성통화 종료</button>
+    <div id="transcription"></div>
+</body>
+</html>
