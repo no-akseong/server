@@ -49,7 +49,6 @@ def voice_service_page():
 @socketio.on("image")
 def handle_img(data):
     image_data = data['img']
-    image_data = image_data.split(',')[1]  # 이미지 데이터 부분만 추출
 
     # 이미지 적절성 판단
     is_safe = api.img_obscenity(image_data)
@@ -62,7 +61,10 @@ def handle_img(data):
             },
         )
         return
-
+    
+    # 적절한 이미지일 경우 추가적인 얼굴 블러 처리
+    image_data = api.blur_faces(image_data)
+    data['img'] = image_data
     socketio.emit('image', data)
 
 
@@ -111,9 +113,14 @@ def is_negative(text):
     s_score = sentiment_scores['simsimi_score']
     d(f"감정 점수: g: {g_score}, s: {s_score}")
 
-    # 감정 점수가 임계값 이하일때 문장 순화 요청
+    # 구글: 문맥 파악 후 감정 점수 반환 잘함 (짧은 단어는 심심이게 맞김)
     if sentiment_scores <= val.GOOGLE_TEXT_NEGATIVE_THRESHOLD:
-        True
+        return True
+    # 심심이: 단어 감정 점수 반환 잘함
+    elif s_score <= val.SIMSIMI_TEXT_NEGATIVE_THRESHOLD:
+        return True
+    else:
+        return False
 
 
 def refine_text(text):

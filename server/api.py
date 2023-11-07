@@ -59,3 +59,11 @@ def img_obscenity(img):
         # 모든 카테고리에서 점수가 IMG_NEGATIVE_THRESHOLD보다 낮으면 True
         is_safe = all([score < val.IMG_NEGATIVE_THRESHOLD for score in scores.values()])
     return is_safe
+
+def blur_faces(img):
+    headers = {"Content-Type": "application/json; charset=utf-8"}
+    url = val.FILTERING_SERVER + "/blur_faces"
+    data = json.dumps({"img": img})
+    response = requests.post(url, data=data, headers=headers)
+    result = json.loads(response.content)
+    return result['img']

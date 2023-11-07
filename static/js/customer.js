@@ -47,7 +47,11 @@ document.addEventListener('DOMContentLoaded', function () {
     fileInput.addEventListener('change', handleFileSelect, false);
 
     function handleFileSelect(event) {
-        const file = event.target.files[0]; // 선택한 파일
+        const file = event.target.files[0]; // 선택한 파일  
+        // 파일 포맷 추출
+        const fileName = file.name;
+        const fileFormat = fileName.split('.')[1].toLowerCase();
+
         const formData = new FormData();
         formData.append('file', file);
 
@@ -56,8 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // FileReader를 사용하여 이미지 파일을 읽어들임
             const reader = new FileReader();
             reader.onloadend = () => {
-                // 이미지 데이터를 서버로 전송
-                socket.emit('send-image', { image: reader.result });
                 // 이미지 채팅방에 출력
                 logImage(reader.result, sender, "right");
                 // 이미지 전송
