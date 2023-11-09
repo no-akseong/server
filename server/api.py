@@ -67,3 +67,14 @@ def blur_faces(img):
     response = requests.post(url, data=data, headers=headers)
     result = json.loads(response.content)
     return result['img']
+
+def qanal(question):
+    """
+    고객의 질문을 분석합니다
+    """
+    headers = {"Content-Type": "application/json; charset=utf-8"}
+    url = val.FILTERING_SERVER + "/qanal"
+    data = json.dumps({"q": question})
+    response = requests.post(url, data=data, headers=headers)
+    result = json.loads(response.content)
+    return result

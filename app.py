@@ -71,6 +71,12 @@ def handle_img(data):
 
 @socketio.on("message")
 def handle_message(message):
+    """
+    상담사와 고객이 텍스트 메시지를 주고 받을 때 호출됨
+
+    고객의 메세지는 블랙리스트와 부정표현 필터링 후 상담사에게 전달
+    고객의 메세지는 추가로 통계분석을 위해 질문분석을 수행 후 저장
+    """
     d(f"메시지 받음: {message}")
     text = message["text"]
 
@@ -80,7 +86,11 @@ def handle_message(message):
         id = val.TEST_CUSTOMER_ID
         if check_blacklist(id):
             return
+        
+        # 질문 분석
+        analyze_question(text)
 
+        # 부정표현 필터링
         message["refined"] = False  # 순화 여부 초기화
         if is_negative(text):
             message["text"] = refine_text(text)
@@ -183,13 +193,19 @@ def onNotify(data):
 @app.route("/chat", methods=["POST"])
 def chat_response():
     """
-    요청이 들어오면 챗봇이 적절한 답변을 보냅니다.
+    고객의 텍스트 요청이 들어오면 챗봇이 적절한 답변 응답
+    고객의 메세지는 추가로 통계분석을 위해 질문분석을 수행 후 저장
     """
     data = request.get_json()
     d(f"/chat: {data}")
 
     # 사용자가 보낸 메시지
     user_msg = data["text"]
+
+    # 질문 분석
+    analyze_question(user_msg)
+
+    # 챗봇에게 응답 요청
     streaming = data.get("streaming", False)
     chatbot_response = api.chatbot_response(user_msg, streaming=streaming)
 
@@ -199,17 +215,44 @@ def chat_response():
 
 @app.route("/on_streaming_response", methods=["POST"])
 def on_streaming_response():
+    """
+    TODO: 더 나은 사용자 경험을 위해, 챗봇의 응답을 streaming방식으로 실시간으로 받아서 고객에게 전송
+    """
     socketio.emit("chatbot-streaming-response", {'text': request.get_json()['text']})
 
 
 @socketio.on("voice_customer")
 def on_voice_customer(data):
-    d(f"/chat: {data}")
+    """
+    voice_customer에서 전송한 STT의 텍스트를 받아서 텍스트로 상담사에게 전송
+    """
     text = data["text"]
     socketio.emit("voice-text", {'text': text})
 
+def analyze_question(question):
+    """
+    질문을 분석하여 val.QANAL_DIR에 qanal.json 파일에 저장
+    
+    TODO: 유저의 아이디별로 파일 관리
+    """
+    # 질문 분석
+    qanal = api.qanal(question)
+    file = os.path.join(val.QANAL_DIR, "qanal.json")
 
+    # 파일 없으면 만들기
+    if not os.path.exists(file):
+        with open(file, "w", encoding="utf-8") as f:
+            json.dump([], f, ensure_ascii=False, indent="\t")
 
+    # 파일 읽어서 리스트에 json데이터 추가 
+    if os.path.exists(file):
+        with open(file, "r", encoding="utf-8") as f:
+            qanal_list = json.load(f)
+    qanal_list.append(qanal)
+
+    # 다시 파일 쓰기
+    with open(file, "w", encoding="utf-8") as f:
+        json.dump(qanal_list, f, ensure_ascii=False, indent="\t")
 
 # 음성통화
 @socketio.on('offer')
@@ -232,6 +275,7 @@ def setup():
         val.LOG_DIR,
         val.DATA_DIR,
         val.CONVERSATIONS_DIR,
+        val.QANAL_DIR
     ]
 
     # 폴더 생성

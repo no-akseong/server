@@ -8,14 +8,12 @@ let startButton
 let stopButton
 let transcriptionDiv
 let sttInUse = false;
-let sttCount = 0;
 let divA, divB, final_transcript = '';
 
 async function onLoad() {
     startButton = document.getElementById('start-button');
     stopButton = document.getElementById('stop-button');
     transcriptionDiv = document.getElementById('transcription');
-    transcriptionDiv.innerHTML = 'STT: ';
 
     divA = document.getElementById('divA');
     divB = document.getElementById('divB');
@@ -40,6 +38,7 @@ async function onLoad() {
     startButton.addEventListener('click', () => {
         startSTT();
         sttInUse = true;
+        final_transcript = ''
     });
 
     stopButton.addEventListener('click', () => {
@@ -63,6 +62,7 @@ function onSTT(event) {
             final_transcript += event.results[i][0].transcript;
             // text의 맨뒤에 \n이 붙어있으면 마지막 문장이라는 뜻
             socket.emit('voice_customer', { 'text': `${final_transcript}\n` })
+            final_transcript=''
         }
         // 끝나기 전에 실시간으로 출력되는 STT 결과
         else {

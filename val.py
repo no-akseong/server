@@ -24,6 +24,7 @@ LOG_DIR = join(ROOT_DIR, "logs")
 # data
 DATA_DIR = join(ROOT_DIR, "data")
 CONVERSATIONS_DIR = join(DATA_DIR, "conversations")
+QANAL_DIR = join(DATA_DIR, "qanal")
 
 # api 키
 GOOGLE_CLOUD_API_KEY = join(ROOT_DIR, r"gcp_api_key.json")

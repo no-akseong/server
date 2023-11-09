@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', onLoad);
 
 let startButton
 let stopButton
-let transcriptionDiv
 let sttInUse = false;
 
 
@@ -20,8 +19,6 @@ let sttInUse = false;
 async function onLoad() {
     startButton = document.getElementById('start-button');
     stopButton = document.getElementById('stop-button');
-    transcriptionDiv = document.getElementById('transcription');
-    transcriptionDiv.innerHTML = 'STT: ';
 
     // 준비
     setupSTT();
