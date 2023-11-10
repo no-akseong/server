@@ -124,10 +124,10 @@ def is_negative(text):
     d(f"감정 점수: g: {g_score}, s: {s_score}")
 
     # 구글: 문맥 파악 후 감정 점수 반환 잘함 (짧은 단어는 심심이게 맞김)
-    if sentiment_scores <= val.GOOGLE_TEXT_NEGATIVE_THRESHOLD:
+    if g_score <= val.GOOGLE_TEXT_NEGATIVE_THRESHOLD:
         return True
     # 심심이: 단어 감정 점수 반환 잘함
-    elif s_score <= val.SIMSIMI_TEXT_NEGATIVE_THRESHOLD:
+    elif s_score >= val.SIMSIMI_TEXT_NEGATIVE_THRESHOLD:
         return True
     else:
         return False
@@ -150,7 +150,7 @@ def check_patience():
         socketio.emit(
             "notify",
             {
-                "text": f"고객의 부적절한 언행이 {val.SERVICE_PATIENT_LIMIT}회 초과되어 챗봇에게 넘겨집니니다.",
+                "text": f"고객의 부적절한 언행이 {val.SERVICE_PATIENT_LIMIT}회 초과되어 잠시후 챗봇에게 넘겨집니니다.",
                 "to": "customer",
                 "action": "chatbot",
             },
@@ -232,27 +232,29 @@ def on_voice_customer(data):
 def analyze_question(question):
     """
     질문을 분석하여 val.QANAL_DIR에 qanal.json 파일에 저장
-    
+
     TODO: 유저의 아이디별로 파일 관리
     """
-    # 질문 분석
-    qanal = api.qanal(question)
-    file = os.path.join(val.QANAL_DIR, "qanal.json")
+    pass
 
-    # 파일 없으면 만들기
-    if not os.path.exists(file):
-        with open(file, "w", encoding="utf-8") as f:
-            json.dump([], f, ensure_ascii=False, indent="\t")
+    # # 질문 분석
+    # qanal = api.qanal(question)
+    # file = os.path.join(val.QANAL_DIR, "qanal.json")
 
-    # 파일 읽어서 리스트에 json데이터 추가 
-    if os.path.exists(file):
-        with open(file, "r", encoding="utf-8") as f:
-            qanal_list = json.load(f)
-    qanal_list.append(qanal)
+    # # 파일 없으면 만들기
+    # if not os.path.exists(file):
+    #     with open(file, "w", encoding="utf-8") as f:
+    #         json.dump([], f, ensure_ascii=False, indent="\t")
 
-    # 다시 파일 쓰기
-    with open(file, "w", encoding="utf-8") as f:
-        json.dump(qanal_list, f, ensure_ascii=False, indent="\t")
+    # # 파일 읽어서 리스트에 json데이터 추가 
+    # if os.path.exists(file):
+    #     with open(file, "r", encoding="utf-8") as f:
+    #         qanal_list = json.load(f)
+    # qanal_list.append(qanal)
+
+    # # 다시 파일 쓰기
+    # with open(file, "w", encoding="utf-8") as f:
+    #     json.dump(qanal_list, f, ensure_ascii=False, indent="\t")
 
 # 음성통화
 @socketio.on('offer')

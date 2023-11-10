@@ -56,13 +56,13 @@ async function onSTT(event) {
     }
 
     const transcript = result[0].transcript;
-    console.log("유저 : " + transcript)
+    console.log("유저STT : " + transcript)
     // transcriptionDiv.textContent += transcript;
 
     // STT 결과를 챗봇에게 전송
     const response = await sendMsgToAI(transcript)
     // 받은 응답을 TTS로 음성 출력
-    console.log("챗봇: " + response.text)
+    console.log("챗봇TTS: " + response.text)
     startTTS(response.text);
 }
 
