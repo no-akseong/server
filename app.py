@@ -11,7 +11,8 @@ from flask_socketio import SocketIO
 
 import val
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='')
+
 global socketio
 socketio = SocketIO(app)
 
@@ -45,6 +46,14 @@ def voice_customer_page():
 @app.route("/voice_service")
 def voice_service_page():
     return send_file("voice_service.html")
+
+@app.route("/call_service")
+def call_service_page():
+    return send_file("call_service.html")
+
+@app.route("/call_customer")
+def call_customer_page():
+    return send_file("call_customer.html")
 
 @socketio.on("image")
 def handle_img(data):
