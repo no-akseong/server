@@ -98,11 +98,22 @@ def handle_message(message):
 
         # 부정표현 필터링
         message["refined"] = False  # 순화 여부 초기화
-        if is_negative(text):
+        g_score, s_score = get_negative_scores(text)
+        data = {}
+       
+        # 점수 고객에게 전송
+        # 둘중(g_score, s_score) 하나라도 부정적이면, 부정적인 점수 1개 리턴
+        # 둘다 긍정적이면, g_score 리턴
+        score = 0
+        is_negative_text, vendor, score = is_negative(g_score, s_score)
+        socketio.emit("negative-score", {"vendor": vendor, "score": score})
+        if is_negative_text:
             message["text"] = refine_text(text)
             message["refined"] = True
             if not check_patience():
                 return
+            
+        
 
     socketio.emit("message", message)
 
@@ -121,22 +132,22 @@ def check_blacklist(id):
         return True
     return False
 
-
-def is_negative(text):
+def get_negative_scores(text):
     # 문장 감정 점수 요청
     sentiment_scores = api.sentiment_score(text)
     g_score = sentiment_scores['google_score']
     s_score = sentiment_scores['simsimi_score']
-    d(f"감정 점수: g: {g_score}, s: {s_score}")
+    return g_score, s_score
 
+def is_negative(g_score, s_score):
     # 구글: 문맥 파악 후 감정 점수 반환 잘함 (짧은 단어는 심심이게 맞김)
     if g_score <= val.GOOGLE_TEXT_NEGATIVE_THRESHOLD:
-        return True
+        return True, "g", g_score
     # 심심이: 단어 감정 점수 반환 잘함
     elif s_score >= val.SIMSIMI_TEXT_NEGATIVE_THRESHOLD:
-        return True
+        return True, "s", s_score
     else:
-        return False
+        return False, "g", g_score
 
 
 def refine_text(text):
@@ -245,7 +256,7 @@ def on_contact_guide():
     if contact not in ("교무부", "학생부", "입학부"):
         contact = '기타-부서'
 
-    # 고객에게 연결 부서로 페이지 변경
+    # 고객에게 연결 부서로 페이지
     socketio.emit(
             "notify",
             {

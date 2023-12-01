@@ -6,6 +6,7 @@ import { logMessage, logImage, sendMessage, socket, sender, NOTIFY_DELAY, sendIm
 
 
 let msg_input;
+let point_cnt = 0;
 // 부트 스트랩 로딩 딜레이: DOMContentLoaded 후 등록
 document.addEventListener('DOMContentLoaded', function () {
     // 민원인의 메세지 수신
@@ -17,6 +18,44 @@ document.addEventListener('DOMContentLoaded', function () {
         logMessage(msg.text, msg.from, "left");
         console.log('Message: ' + msg.text);
     });
+
+    // 민원인의 메세지 수신
+    socket.on('negative-score', (msg) => {
+        console.log("vendor: ", msg.vendor, "score: ", msg.score)
+        let newPoint = 0;
+        // newPoint 소수점 2자리까지 표시
+        newPoint = msg.score.toFixed(2);
+
+        if (msg.vendor === 'g') {
+            newPoint = mapValue(newPoint, -1, 1, 0, 1); // -1.0 ~ 1.0을 0.0 ~ 1.0 사이로 정규화
+        } else if (msg.vendor === 's') {
+            newPoint = 1 - newPoint; // simsimi는 긍정점수가 아닌 부정점수이므로 1에서 빼줌
+        }
+
+        console.log("new point: ", newPoint);
+        newPoint = newPoint * 100; // 백분율로 변환
+        newPoint = Math.round(newPoint); // 소수점 제거
+
+        // TODO: 만약 점수가 더 부정적일 수록 지수적으로 더 큰 패널티 부여
+        
+        
+        // id가 point인 요소에 점수를 표시
+        let pointElem = document.getElementById('point');
+        let pointStr = pointElem.innerHTML.trim();
+        // 이미 표시되어있는 점수 정수로 가져오기
+        let prePoint = parseInt(pointStr.split(' ')[1]);
+        let totalPoint = prePoint * point_cnt;
+        totalPoint += newPoint;
+        point_cnt += 1;
+        let finalPoint = Math.round(totalPoint / point_cnt);
+        pointElem.innerHTML = `포인트: ${finalPoint}점`;
+        console.log( `포인트: ${finalPoint}`)
+    });
+
+    function mapValue(value, inMin, inMax, outMin, outMax) {
+        // 현재 범위(inMin에서 inMax)에서의 value를 새로운 범위(outMin에서 outMax)로 매핑
+        return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+    }
 
     // 메시지 전송 버튼
     msg_input = document.getElementById('sendingMessage'); // 메시지 입력창
