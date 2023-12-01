@@ -46,6 +46,10 @@ def voice_customer_page():
 def voice_service_page():
     return send_file("voice_service.html")
 
+@app.route("/contact-guide")
+def task_anal_page():
+    return send_file("contact-guide.html")
+
 @socketio.on("image")
 def handle_img(data):
     image_data = data['img']
@@ -213,6 +217,48 @@ def chat_response():
     response = {"text": chatbot_response}
     return jsonify(response), 200
 
+def on_qanal(text):
+    """
+    고객의 질문 분석
+    """
+    # 챗봇에게 응답 요청
+    response = api.qanal(text)
+    d(f"on_qanal: {response}")
+
+    
+    
+    response = {"contact": contact}
+    return jsonify(response), 200
+
+@app.route("/contact-guide", methods=["POST"])
+def on_contact_guide():
+    """
+    고객의 메세지를 토대로 어느 부서로 연결되어야 하는지 분석
+    """
+    data = request.get_json()
+    d(f"/on_contact_guide: {data}")
+
+    # 사용자가 보낸 메시지
+    user_msg = data["text"]
+
+    # 챗봇에게 응답 요청
+    contact = api.contact_guide(user_msg)
+
+    if contact not in ("교무부", "학생부", "입학부"):
+        contact = '기타-부서'
+
+    socketio.emit(
+            "notify",
+            {
+                "text": f"{contact}로 잠시후 연결해드리겠습니다...",
+                "to": "contact-guide",
+                "action": "customer",
+            },
+        )
+
+    response = {"contact": contact}
+    return jsonify(response), 200
+
 @app.route("/on_streaming_response", methods=["POST"])
 def on_streaming_response():
     """
@@ -256,18 +302,6 @@ def analyze_question(question):
     # with open(file, "w", encoding="utf-8") as f:
     #     json.dump(qanal_list, f, ensure_ascii=False, indent="\t")
 
-# 음성통화
-@socketio.on('offer')
-def handle_offer(offer):
-    # offer를 받아와서 처리할 수 있는 로직을 여기에 추가합니다.
-    # 예를 들어, offer를 다른 클라이언트에게 브로드캐스팅하여 응답을 받을 수 있습니다.
-    socketio.emit('offer', offer, broadcast=True)
-
-@socketio.on('answer')
-def handle_answer(answer):
-    # answer를 받아와서 처리할 수 있는 로직을 여기에 추가합니다.
-    # 예를 들어, answer를 offer를 보낸 클라이언트에게 전송하여 연결을 설정할 수 있습니다.
-    socketio.emit('answer', answer, broadcast=True)
 
 
 

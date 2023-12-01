@@ -109,6 +109,7 @@ export var sender = pathSegments[pathSegments.length - 1];
 // 부트 스트랩 로딩 딜레이: DOMContentLoaded 후 등록
 document.addEventListener('DOMContentLoaded', function () {
     socket.on('notify', (msg) => {
+        // 메세지 받는 사람(msg.to)가 현재 페이지의 sender가 아니면 무시
         if (msg.to !== sender)
             return
 

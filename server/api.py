@@ -74,17 +74,17 @@ def qanal(question):
     """
     headers = {"Content-Type": "application/json; charset=utf-8"}
     url = val.FILTERING_SERVER + "/qanal"
-    data = json.dumps({"q": question})
+    data = json.dumps({"text": question})
     response = requests.post(url, data=data, headers=headers)
     result = json.loads(response.content)
     return result
 
-def taskanal(text):
+def contact_guide(text):
     """
     고객의 질문이 어느 부서로 연결되어야 하는지 분석합니다
     """
     headers = {"Content-Type": "application/json; charset=utf-8"}
-    url = val.FILTERING_SERVER + "/taskanal"
+    url = val.FILTERING_SERVER + "/contact-guide"
     data = json.dumps({"text": text})
     response = requests.post(url, data=data, headers=headers)
     result = json.loads(response.content)
