@@ -225,12 +225,8 @@ def on_qanal(text):
     """
     # 챗봇에게 응답 요청
     response = api.qanal(text)
-    d(f"on_qanal: {response}")
-
     
     
-    response = {"contact": contact}
-    return jsonify(response), 200
 
 @app.route("/contact-guide", methods=["POST"])
 def on_contact_guide():
@@ -249,6 +245,7 @@ def on_contact_guide():
     if contact not in ("교무부", "학생부", "입학부"):
         contact = '기타-부서'
 
+    # 고객에게 연결 부서로 페이지 변경
     socketio.emit(
             "notify",
             {
@@ -283,26 +280,25 @@ def analyze_question(question):
 
     TODO: 유저의 아이디별로 파일 관리
     """
-    pass
 
-    # # 질문 분석
-    # qanal = api.qanal(question)
-    # file = os.path.join(val.QANAL_DIR, "qanal.json")
+    # 질문 분석
+    qanal = api.qanal(question)
+    file = os.path.join(val.QANAL_DIR, "qanal.json")
 
-    # # 파일 없으면 만들기
-    # if not os.path.exists(file):
-    #     with open(file, "w", encoding="utf-8") as f:
-    #         json.dump([], f, ensure_ascii=False, indent="\t")
+    # 파일 없으면 만들기
+    if not os.path.exists(file):
+        with open(file, "w", encoding="utf-8") as f:
+            json.dump([], f, ensure_ascii=False, indent="\t")
 
-    # # 파일 읽어서 리스트에 json데이터 추가 
-    # if os.path.exists(file):
-    #     with open(file, "r", encoding="utf-8") as f:
-    #         qanal_list = json.load(f)
-    # qanal_list.append(qanal)
+    # 파일 읽어서 리스트에 json데이터 추가 
+    if os.path.exists(file):
+        with open(file, "r", encoding="utf-8") as f:
+            qanal_list = json.load(f)
+    qanal_list.append(qanal)
 
-    # # 다시 파일 쓰기
-    # with open(file, "w", encoding="utf-8") as f:
-    #     json.dump(qanal_list, f, ensure_ascii=False, indent="\t")
+    # 다시 파일 쓰기
+    with open(file, "w", encoding="utf-8") as f:
+        json.dump(qanal_list, f, ensure_ascii=False, indent="\t")
 
 
 
