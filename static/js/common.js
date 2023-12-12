@@ -42,11 +42,11 @@ export function logMessage(message, sender, location = "center") {
     <div id="message">
         <div class="${msgLocationClass}">
             ${profile_div}
-            <div id="content"
+            <div style="font-size: 40px;" id="content"
                 class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3 ${style1}"
             >
-                <div id="name" class="font-weight-bold mb-1 ${style2}"><b>${toKor(sender)}</b></div>
-                ${message}
+                <div id="name" class="font-weight-bold mb-1 ${style2}" style="font-size: 30px;"><b>${toKor(sender)}</b></div>
+                <div style="font-size: 40px;">${message}</div>
             </div>
         </div>
     </div>
@@ -59,7 +59,7 @@ export function logMessage(message, sender, location = "center") {
 export function logImage(img, sender, location = "center") {
     let imgElement = document.createElement('img');
     imgElement.src = img; // 이미지 URL 설정
-    imgElement.style.maxWidth = '50%'; // 대화 메세지 div 너비의 50%까지만 허용
+    imgElement.style.maxWidth = '100%'; // 대화 메세지 div 너비의 50%까지만 허용
     const tagHTML = imgElement.outerHTML;
     logMessage(tagHTML, sender, location);
 }
